@@ -35,7 +35,7 @@ def clone_load_balancer(clb_id, vip):
         # 返回的resp是一个CloneLoadBalancerResponse的实例，与请求对象对应
         resp = client.CloneLoadBalancer(req)
         # 输出json格式的字符串回包
-        # print(resp.to_json_string())
+        print(resp.to_json_string())
         resp_data_obj = json.loads(resp.to_json_string())
         request_id = resp_data_obj['RequestId']
 
@@ -44,7 +44,7 @@ def clone_load_balancer(clb_id, vip):
 
     return request_id
 
-def get_task_result(clb_id):
+def get_task_result(request_id):
     from tencentcloud.clb.v20180317 import clb_client, models
     task_data_obj = {}
     try:
@@ -63,14 +63,14 @@ def get_task_result(clb_id):
         client = clb_client.ClbClient(cred, "ap-shanghai", clientProfile)
 
         # 实例化一个请求对象,每个接口都会对应一个request对象
-        req = models.CloneLoadBalancerRequest()
+        req = models.DescribeTaskStatusRequest()
         params = {
-            "LoadBalancerId": clb_id,
+            "TaskId": request_id
         }
         req.from_json_string(json.dumps(params))
 
-        # 返回的resp是一个CloneLoadBalancerResponse的实例，与请求对象对应
-        resp = client.CloneLoadBalancer(req)
+        # 返回的resp是一个DescribeTaskStatusResponse的实例，与请求对象对应
+        resp = client.DescribeTaskStatus(req)
         # 输出json格式的字符串回包
         # print(resp.to_json_string())
         task_data_obj = json.loads(resp.to_json_string())
@@ -83,7 +83,9 @@ def get_task_result(clb_id):
 
 def main():
     clb_id = sys.argv[1]
+    print("start clone clb : %s" % clb_id)
     request_id = clone_load_balancer(clb_id, VIP)
+    print("request_id : %s" % request_id)
     clone_clb_id = ""
     # 根据克隆CLB返回的request_id, 间隔1s轮询任务结果
     while True and request_id != "":

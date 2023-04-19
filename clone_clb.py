@@ -40,6 +40,7 @@ def clone_load_balancer(clb_id):
         # print(resp.to_json_string())
         resp_data_obj = json.loads(resp.to_json_string())
         request_id = resp_data_obj['RequestId']
+        print("request_id: %s" % request_id)
 
     except TencentCloudSDKException as err:
         print(err)
@@ -47,7 +48,7 @@ def clone_load_balancer(clb_id):
     return request_id
 
 
-def get_task_result(clb_id):
+def get_task_result(task_id):
     from tencentcloud.clb.v20180317 import clb_client, models
     task_data_obj = {}
     try:
@@ -68,14 +69,14 @@ def get_task_result(clb_id):
         # 实例化一个请求对象,每个接口都会对应一个request对象
         req = models.DescribeTaskStatusRequest()
         params = {
-            "TaskId": "request_id"
+            "TaskId": task_id,
         }
         req.from_json_string(json.dumps(params))
 
         # 返回的resp是一个DescribeTaskStatusResponse的实例，与请求对象对应
         resp = client.DescribeTaskStatus(req)
         # 输出json格式的字符串回包
-        # print(resp.to_json_string())
+        print(resp.to_json_string())
         task_data_obj = json.loads(resp.to_json_string())
 
     except TencentCloudSDKException as err:
